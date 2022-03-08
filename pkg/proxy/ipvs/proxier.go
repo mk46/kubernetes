@@ -625,7 +625,10 @@ func (handle *LinuxKernelHandler) GetModules() ([]string, error) {
 			return nil, fmt.Errorf("failed to read Kernel Config file %s with error %w", kernelConfigFile, err)
 		}
 		for _, module := range ipvsModules {
-			if match, _ := regexp.Match("CONFIG_"+strings.ToUpper(module)+"=y", kConfig); match {
+			if match, matchErr := regexp.Match("CONFIG_"+strings.ToUpper(module)+"=y", kConfig); match {
+				if matchErr != nil {
+					return nil, fmt.Errorf("failed to add ipvs module %s with error %w", module, matchErr)
+				}
 				bmods = append(bmods, module)
 			}
 		}
